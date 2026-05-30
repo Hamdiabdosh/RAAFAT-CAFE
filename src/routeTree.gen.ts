@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SelectPlanRouteImport } from './routes/select-plan'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PendingPaymentRouteImport } from './routes/pending-payment'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LoginRouteImport } from './routes/login'
@@ -44,6 +46,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
   path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -57,6 +64,11 @@ const SelectPlanRoute = SelectPlanRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PendingPaymentRoute = PendingPaymentRouteImport.update({
@@ -192,9 +204,11 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/pending-payment': typeof PendingPaymentRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/select-plan': typeof SelectPlanRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/cafes': typeof AdminCafesRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
@@ -222,9 +236,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/pending-payment': typeof PendingPaymentRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/select-plan': typeof SelectPlanRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/plans': typeof AdminPlansRoute
@@ -253,9 +269,11 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/pending-payment': typeof PendingPaymentRoute
+  '/privacy': typeof PrivacyRoute
   '/register': typeof RegisterRoute
   '/select-plan': typeof SelectPlanRoute
   '/settings': typeof SettingsRoute
+  '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/cafes': typeof AdminCafesRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
@@ -286,9 +304,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/pending-payment'
+    | '/privacy'
     | '/register'
     | '/select-plan'
     | '/settings'
+    | '/terms'
     | '/verify-email'
     | '/admin/cafes'
     | '/admin/login'
@@ -316,9 +336,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/pending-payment'
+    | '/privacy'
     | '/register'
     | '/select-plan'
     | '/settings'
+    | '/terms'
     | '/verify-email'
     | '/admin/login'
     | '/admin/plans'
@@ -346,9 +368,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/maintenance'
     | '/pending-payment'
+    | '/privacy'
     | '/register'
     | '/select-plan'
     | '/settings'
+    | '/terms'
     | '/verify-email'
     | '/admin/cafes'
     | '/admin/login'
@@ -378,9 +402,11 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
   PendingPaymentRoute: typeof PendingPaymentRoute
+  PrivacyRoute: typeof PrivacyRoute
   RegisterRoute: typeof RegisterRoute
   SelectPlanRoute: typeof SelectPlanRoute
   SettingsRoute: typeof SettingsRoute
+  TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   AdminCafesRoute: typeof AdminCafesRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
@@ -398,6 +424,13 @@ declare module '@tanstack/react-router' {
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -419,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pending-payment': {
@@ -670,9 +710,11 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
   PendingPaymentRoute: PendingPaymentRoute,
+  PrivacyRoute: PrivacyRoute,
   RegisterRoute: RegisterRoute,
   SelectPlanRoute: SelectPlanRoute,
   SettingsRoute: SettingsRoute,
+  TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   AdminCafesRoute: AdminCafesRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,

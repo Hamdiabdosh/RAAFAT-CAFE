@@ -7,15 +7,11 @@ import {
   Line,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  Legend,
 } from "recharts";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -24,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api";
 import {
   downloadAnalyticsExport,
@@ -53,9 +48,6 @@ const RANGES: { id: AnalyticsRange; label: string }[] = [
   { id: "this_month", label: "This month" },
   { id: "custom", label: "Custom" },
 ];
-
-const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const COLORS = ["var(--gold)", "var(--info)", "var(--success)", "var(--warning)"];
 
 function OverviewPage() {
   const hasAnalytics = useEntitlement("analytics");
@@ -118,18 +110,6 @@ function OverviewPage() {
   const chartDays = daily?.days ?? [];
   const hasData = chartDays.some((d) => d.orders > 0);
   const activeCount = live?.orders.length ?? 0;
-
-  const peakMatrix = useMemo(() => {
-    const max = Math.max(1, ...(peak?.grid.map((c) => c.count) ?? [1]));
-    return peak?.grid.map((c) => ({ ...c, intensity: c.count / max })) ?? [];
-  }, [peak]);
-
-  const typeChart = orderTypes
-    ? [
-        { name: "Dine in", value: orderTypes.dine_in.count },
-        { name: "Takeaway", value: orderTypes.takeaway.count },
-      ]
-    : [];
 
   return (
     <>
@@ -214,16 +194,30 @@ function OverviewPage() {
         />
         <KpiCard label="Today's orders" value={summary ? String(summary.today_orders) : "—"} />
         <KpiCard
-          label="Active in queue"
-          value={String(activeCount)}
-          delta={activeCount > 0 ? "Needs attention" : "All clear"}
+          label="Month revenue"
+          value={summary ? formatMoney(summary.month_revenue) : "—"}
         />
         <KpiCard
-          label="This month"
-          value={summary ? formatMoney(summary.month_revenue) : "—"}
-          delta={summary ? `${summary.month_orders} orders` : undefined}
+          label="Month orders"
+          value={summary ? String(summary.month_orders) : "—"}
         />
       </div>
+      )}
+
+      {hasOrders && (
+        <Card className="mt-4 p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Live orders</p>
+            <p className="text-xs text-muted-foreground">
+              {activeCount > 0
+                ? `${activeCount} order${activeCount === 1 ? "" : "s"} in queue`
+                : "No active orders right now"}
+            </p>
+          </div>
+          <Button asChild size="sm" variant={activeCount > 0 ? "default" : "outline"}>
+            <Link to="/dashboard/orders">View queue</Link>
+          </Button>
+        </Card>
       )}
 
       {hasOrders && live && live.orders.length > 0 && (
@@ -325,127 +319,11 @@ function OverviewPage() {
         </Card>
       </div>
 
-      <Card className="mt-6 p-6 bg-card">
-        <h3 className="font-display text-lg font-semibold mb-4">Peak hours</h3>
-        {!peakMatrix.length || peakMatrix.every((c) => c.count === 0) ? (
-          <p className="text-sm text-muted-foreground">No data for heatmap</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <div className="inline-grid gap-0.5" style={{ gridTemplateColumns: "repeat(25, 1fr)" }}>
-              <div />
-              {Array.from({ length: 24 }, (_, h) => (
-                <div key={h} className="text-[9px] text-center text-muted-foreground">
-                  {h}
-                </div>
-              ))}
-              {DAY_LABELS.map((label, day) => [
-                <div key={`l-${day}`} className="text-[10px] pr-2 text-muted-foreground">
-                  {label}
-                </div>,
-                ...Array.from({ length: 24 }, (_, hour) => {
-                  const cell = peakMatrix.find((c) => c.day === day && c.hour === hour);
-                  const alpha = cell?.intensity ?? 0;
-                  return (
-                    <div
-                      key={`${day}-${hour}`}
-                      title={`${cell?.count ?? 0} orders`}
-                      className="h-4 w-4 rounded-sm"
-                      style={{
-                        backgroundColor: `color-mix(in oklch, var(--gold) ${Math.round(alpha * 100)}%, transparent)`,
-                      }}
-                    />
-                  );
-                }),
-              ])}
-            </div>
-          </div>
-        )}
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
-        <Card className="p-6 bg-card">
-          <h3 className="font-display text-lg font-semibold mb-4">Dine-in vs takeaway</h3>
-          {typeChart.every((t) => t.value === 0) ? (
-            <p className="text-sm text-muted-foreground">No orders in period</p>
-          ) : (
-            <div className="h-56">
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={typeChart} dataKey="value" nameKey="name" innerRadius={45} outerRadius={75}>
-                    {typeChart.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </Card>
-
-        <Card className="p-0 overflow-hidden bg-card">
-          <div className="p-6 pb-3">
-            <h3 className="font-display text-lg font-semibold">Top items</h3>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Item</TableHead>
-                <TableHead className="text-right">Qty</TableHead>
-                <TableHead className="text-right">Revenue</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {(topItems?.items.length ? topItems.items : []).map((item) => (
-                <TableRow key={item.name}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell className="text-right">{item.qty}</TableCell>
-                  <TableCell className="text-right">{formatMoney(item.revenue)}</TableCell>
-                </TableRow>
-              ))}
-              {!topItems?.items.length && (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-muted-foreground">
-                    No served items yet
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+      <div className="mt-2 text-right">
+        <Link to="/dashboard/analytics" className="text-xs text-gold hover:underline">
+          Full analytics →
+        </Link>
       </div>
-
-      <Card className="mt-6 p-0 overflow-hidden bg-card">
-        <div className="p-6 pb-3">
-          <h3 className="font-display text-lg font-semibold">Category performance</h3>
-        </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Line items</TableHead>
-              <TableHead className="text-right">Revenue</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(categories?.categories ?? []).map((c) => (
-              <TableRow key={c.category_id}>
-                <TableCell>{c.name}</TableCell>
-                <TableCell className="text-right">{c.orders}</TableCell>
-                <TableCell className="text-right">{formatMoney(c.revenue)}</TableCell>
-              </TableRow>
-            ))}
-            {!categories?.categories.length && (
-              <TableRow>
-                <TableCell colSpan={3} className="text-muted-foreground">
-                  No category data in this period
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </Card>
       </>
       )}
     </>

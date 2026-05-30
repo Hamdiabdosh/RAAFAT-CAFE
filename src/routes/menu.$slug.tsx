@@ -81,6 +81,15 @@ function CustomerMenuPage() {
   const orderingEnabled = data?.ordering_enabled ?? false;
 
   useEffect(() => {
+    if (cafe?.name) {
+      document.title = `${cafe.name} — Menu`;
+    }
+    return () => {
+      document.title = "CaféOS";
+    };
+  }, [cafe?.name]);
+
+  useEffect(() => {
     if (categories.length && !activeCategory) {
       setActiveCategory(categories[0].id);
     }

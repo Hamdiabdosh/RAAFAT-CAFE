@@ -121,13 +121,13 @@ function RegisterPage() {
           <Checkbox id="terms" required className="mt-0.5" />
           <span>
             I agree to the{" "}
-            <a href="#" className="text-gold hover:underline">
+            <Link to="/terms" className="text-gold hover:underline" target="_blank">
               Terms of Service
-            </a>{" "}
+            </Link>{" "}
             and{" "}
-            <a href="#" className="text-gold hover:underline">
+            <Link to="/privacy" className="text-gold hover:underline" target="_blank">
               Privacy Policy
-            </a>
+            </Link>
           </span>
         </label>
         <Button type="submit" className="w-full" disabled={loading}>

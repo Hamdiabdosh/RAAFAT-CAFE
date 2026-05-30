@@ -9,12 +9,10 @@ import { useAuthStore } from "@/stores/auth-store";
 
 /** Placeholder payment details — update before going live. */
 const PAYMENT = {
-  TELEBIRR_NUMBER: "[TELEBIRR_NUMBER]",
-  CBE_ACCOUNT: "[CBE_ACCOUNT]",
-  BUSINESS_NAME: "[BUSINESS_NAME]",
-  BANK_NAME: "[BANK_NAME]",
-  ACCOUNT_NUMBER: "[ACCOUNT_NUMBER]",
-  CONTACT_EMAIL: "[CONTACT_EMAIL]",
+  TELEBIRR_NUMBER: "+251/0 931947040",
+  CBE_ACCOUNT: "1000344200193",
+  BUSINESS_NAME: "Abdulhamid Teweleda",
+  CONTACT_EMAIL: "raafatdigital@gmail.com",
 } as const;
 
 export const Route = createFileRoute("/pending-payment")({
@@ -45,12 +43,6 @@ function PaymentInstructionsCard() {
         <p className="font-medium">Method 2: CBE</p>
         <p className="text-muted-foreground mt-1">
           Account: {PAYMENT.CBE_ACCOUNT} · Name: {PAYMENT.BUSINESS_NAME}
-        </p>
-      </div>
-      <div>
-        <p className="font-medium">Method 3: Bank transfer</p>
-        <p className="text-muted-foreground mt-1">
-          Bank: {PAYMENT.BANK_NAME} · Account: {PAYMENT.ACCOUNT_NUMBER}
         </p>
       </div>
       <p className="text-muted-foreground border-t border-border pt-4">

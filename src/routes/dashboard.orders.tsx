@@ -52,6 +52,40 @@ const STATUS_LABEL: Record<string, string> = {
   ready: "Ready",
 };
 
+const STATUS_BADGE: Record<string, string> = {
+  new: "border-red-500 text-red-400 bg-red-500/10",
+  preparing: "border-amber-500 text-amber-400 bg-amber-500/10",
+  ready: "border-green-500 text-green-400 bg-green-500/10",
+};
+
+const STATUS_CARD: Record<string, string> = {
+  new: "border-l-4 border-l-red-500 bg-red-500/5",
+  preparing: "border-l-4 border-l-amber-500 bg-amber-500/5",
+  ready: "border-l-4 border-l-green-500 bg-green-500/5",
+};
+
+function useElapsed(createdAt: string) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  const mins = Math.floor((now - new Date(createdAt).getTime()) / 60_000);
+  if (mins < 1) return "just now";
+  if (mins === 1) return "1 min ago";
+  return `${mins} min ago`;
+}
+
+function ElapsedBadge({ createdAt }: { createdAt: string }) {
+  const elapsed = useElapsed(createdAt);
+  const mins = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60_000);
+  const color =
+    mins >= 25 ? "text-red-400" :
+    mins >= 15 ? "text-amber-400" :
+    "text-muted-foreground";
+  return <span className={`text-sm ${color}`}>{elapsed}</span>;
+}
+
 function LiveOrdersPage() {
   const queryClient = useQueryClient();
   const cafeId = useAuthStore((s) => s.owner?.cafe_id);
@@ -204,12 +238,16 @@ function LiveOrdersPage() {
       <div className="space-y-4">
         {orders.map((order) => {
           const next = NEXT_STATUS[order.status];
-          return (
-            <Card key={order.id} className="p-4">
+          const cardClass = `p-4 relative ${STATUS_CARD[order.status] ?? ""}`;
+          const cardContent = (
+            <>
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <span className="text-lg font-bold">#{order.daily_number}</span>
-                  <Badge className="ml-2" variant="outline">
+                  <Badge
+                    className={`ml-2 ${STATUS_BADGE[order.status] ?? ""}`}
+                    variant="outline"
+                  >
                     {STATUS_LABEL[order.status] ?? order.status}
                   </Badge>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -217,7 +255,7 @@ function LiveOrdersPage() {
                       ? `Dine in · Table ${order.table_number}`
                       : "Takeaway"}
                     {" · "}
-                    {new Date(order.created_at).toLocaleTimeString()}
+                    <ElapsedBadge createdAt={order.created_at} />
                   </p>
                 </div>
                 <span className="font-semibold">{formatMoney(order.total_amount)}</span>
@@ -293,6 +331,19 @@ function LiveOrdersPage() {
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
+            </>
+          );
+          if (order.status === "new") {
+            return (
+              <div key={order.id} className="relative">
+                <div className="absolute -inset-0.5 rounded-xl bg-red-500/20 animate-pulse" />
+                <Card className={cardClass}>{cardContent}</Card>
+              </div>
+            );
+          }
+          return (
+            <Card key={order.id} className={cardClass}>
+              {cardContent}
             </Card>
           );
         })}

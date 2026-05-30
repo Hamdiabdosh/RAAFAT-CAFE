@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowDown, UtensilsCrossed } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Card } from "@/components/ui/card";
@@ -133,10 +133,21 @@ function MenuBuilderPage() {
             </Button>
           </Card>
 
-          {data.categories.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Create your first category, then add items.
-            </p>
+          {!isLoading && (!data?.categories || data.categories.length === 0) && (
+            <Card className="p-8 text-center space-y-3">
+              <div className="mx-auto h-12 w-12 rounded-full bg-gold-dim border border-gold-soft flex items-center justify-center">
+                <UtensilsCrossed className="h-6 w-6 text-gold" />
+              </div>
+              <h3 className="font-semibold text-lg">Build your first menu</h3>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                Start by creating a category — like &quot;Coffee&quot;, &quot;Food&quot;, or &quot;Cold Drinks&quot;.
+                Then add items inside each category.
+              </p>
+              <div className="flex items-center justify-center gap-2 pt-2 text-sm text-muted-foreground">
+                <ArrowDown className="h-4 w-4 text-gold animate-bounce" />
+                <span>Type a category name below and press Create</span>
+              </div>
+            </Card>
           )}
 
           <div className="space-y-6">
