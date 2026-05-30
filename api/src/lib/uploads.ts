@@ -1,5 +1,6 @@
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
+import multer from "multer";
 import { env } from "../config/env.js";
 import { ValidationError } from "./errors.js";
 
@@ -11,6 +12,11 @@ export type UploadedImage = {
   size: number;
   buffer: Buffer;
 };
+
+export const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 export function getUploadRoot(): string {
   return path.resolve(process.cwd(), env.UPLOAD_DIR);
@@ -30,22 +36,16 @@ export function validateLogoFile(file: UploadedImage) {
   }
 }
 
-export function logoPublicUrl(filename: string): string {
-  return `${env.API_PUBLIC_URL}/uploads/logos/${filename}`;
+export function logoStorageKey(cafeId: string, ext: string): string {
+  return `logos/${cafeId}${ext}`;
 }
 
-export function logoFilename(cafeId: string, ext: string): string {
-  return `${cafeId}${ext}`;
-}
-
-export function itemPhotoPublicUrl(filename: string): string {
-  return `${env.API_PUBLIC_URL}/uploads/items/${filename}`;
-}
-
-export function itemPhotoFilename(itemId: string, ext: string): string {
-  return `${itemId}${ext}`;
+export function itemPhotoStorageKey(itemId: string, ext: string): string {
+  return `items/${itemId}${ext}`;
 }
 
 export function validateItemPhotoFile(file: UploadedImage) {
   validateLogoFile(file);
 }
+
+export { deleteFile, uploadFile } from "./storage.js";

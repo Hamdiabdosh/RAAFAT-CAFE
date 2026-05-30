@@ -1,14 +1,11 @@
-import path from "node:path";
-import { unlink, writeFile } from "node:fs/promises";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prisma.js";
 import { ForbiddenError, NotFoundError, ValidationError } from "../../lib/errors.js";
 import { getCafeByOwnerId } from "../cafe/cafe.service.js";
 import {
-  ensureUploadDirs,
-  getUploadRoot,
-  itemPhotoFilename,
-  itemPhotoPublicUrl,
+  deleteFile,
+  itemPhotoStorageKey,
+  uploadFile,
   validateItemPhotoFile,
   type UploadedImage,
 } from "../../lib/uploads.js";
@@ -342,21 +339,18 @@ export async function setItemAvailability(
 
 export async function uploadItemPhoto(ownerId: string, itemId: string, file: UploadedImage) {
   validateItemPhotoFile(file);
-  await ensureUploadDirs();
   const item = await assertItemOwner(ownerId, itemId);
   const ext = file.mimetype === "image/png" ? ".png" : ".jpg";
-  const filename = itemPhotoFilename(itemId, ext);
-  const filepath = path.join(getUploadRoot(), "items", filename);
+  const storageKey = itemPhotoStorageKey(itemId, ext);
 
   if (item.photoUrl) {
-    const oldName = path.basename(new URL(item.photoUrl, "http://x").pathname);
-    await unlink(path.join(getUploadRoot(), "items", oldName)).catch(() => undefined);
+    await deleteFile(item.photoUrl);
   }
 
-  await writeFile(filepath, file.buffer);
+  const photoUrl = await uploadFile(file.buffer, storageKey, file.mimetype);
   const updated = await prisma.item.update({
     where: { id: itemId },
-    data: { photoUrl: itemPhotoPublicUrl(filename) },
+    data: { photoUrl },
     include: itemInclude,
   });
   return formatItem(updated);

@@ -19,6 +19,11 @@ const envSchema = z.object({
   EMAIL_FROM: z.string().default("CaféOS <noreply@cafeos.local>"),
   API_PUBLIC_URL: z.string().url().default("http://localhost:3001"),
   UPLOAD_DIR: z.string().default("uploads"),
+  R2_ACCOUNT_ID: z.string().optional(),
+  R2_ACCESS_KEY_ID: z.string().optional(),
+  R2_SECRET_ACCESS_KEY: z.string().optional(),
+  R2_BUCKET: z.string().optional(),
+  R2_PUBLIC_URL: z.string().optional(),
 });
 
 const result = envSchema.safeParse(process.env);

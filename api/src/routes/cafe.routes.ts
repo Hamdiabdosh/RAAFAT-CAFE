@@ -1,5 +1,4 @@
 import { Router } from "express";
-import multer from "multer";
 import * as cafeService from "../modules/cafe/cafe.service.js";
 import {
   updateHoursSchema,
@@ -11,11 +10,7 @@ import { requireOwner, type AuthenticatedRequest } from "../middleware/auth.js";
 import { sendSuccess } from "../lib/response.js";
 import { ValidationError } from "../lib/errors.js";
 import { formatTimeString } from "../lib/time.js";
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 2 * 1024 * 1024 },
-});
+import { upload } from "../lib/uploads.js";
 
 export const cafeRouter = Router();
 

@@ -1,5 +1,3 @@
-import path from "node:path";
-import { writeFile, unlink } from "node:fs/promises";
 import type { Cafe, OperatingHour } from "@prisma/client";
 import QRCode from "qrcode";
 import PDFDocument from "pdfkit";
@@ -8,10 +6,9 @@ import { NotFoundError, ValidationError } from "../../lib/errors.js";
 import { env } from "../../config/env.js";
 import { formatTimeString, parseTimeString } from "../../lib/time.js";
 import {
-  ensureUploadDirs,
-  getUploadRoot,
-  logoFilename,
-  logoPublicUrl,
+  deleteFile,
+  logoStorageKey,
+  uploadFile,
   validateLogoFile,
   type UploadedImage,
 } from "../../lib/uploads.js";
@@ -90,19 +87,15 @@ export async function updateProfile(ownerId: string, input: UpdateProfileInput) 
 
 export async function uploadLogo(ownerId: string, file: UploadedImage) {
   validateLogoFile(file);
-  await ensureUploadDirs();
   const cafe = await getCafeByOwnerId(ownerId);
   const ext = file.mimetype === "image/png" ? ".png" : ".jpg";
-  const filename = logoFilename(cafe.id, ext);
-  const filepath = path.join(getUploadRoot(), "logos", filename);
+  const storageKey = logoStorageKey(cafe.id, ext);
 
   if (cafe.logoUrl) {
-    const oldName = path.basename(new URL(cafe.logoUrl, "http://x").pathname);
-    await unlink(path.join(getUploadRoot(), "logos", oldName)).catch(() => undefined);
+    await deleteFile(cafe.logoUrl);
   }
 
-  await writeFile(filepath, file.buffer);
-  const logoUrl = logoPublicUrl(filename);
+  const logoUrl = await uploadFile(file.buffer, storageKey, file.mimetype);
 
   return prisma.cafe.update({
     where: { id: cafe.id },
