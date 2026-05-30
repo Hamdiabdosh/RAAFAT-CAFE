@@ -1,46 +1,103 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
-  ChevronDown,
-  Smartphone,
-  Moon,
-  Palette,
   BarChart3,
-  Lock,
-  Settings,
+  Check,
+  ChevronDown,
+  ClipboardList,
+  QrCode,
+  Smartphone,
+  Sparkles,
+  UtensilsCrossed,
+  Zap,
 } from "lucide-react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  fetchPublicPlans,
+  formatMoneyPerMonth,
+  formatMoneyPerYear,
+} from "@/lib/public-api";
+import { useIsClient } from "@/hooks/use-is-client";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "CaféOS — Digital menus & QR ordering for cafés" },
+      {
+        name: "description",
+        content:
+          "Subscription SaaS for independent cafés. Build your menu, share a QR code, and manage live orders from any device.",
+      },
+    ],
+  }),
   component: Index,
 });
 
 const features = [
-  { icon: Smartphone, title: "Fully Responsive", desc: "Pixel-perfect across phones, tablets, laptops, desktops, and 4K displays." },
-  { icon: Moon, title: "Dark / Light Mode", desc: "System-aware theme with a one-click toggle that remembers your preference." },
-  { icon: Palette, title: "Brand System", desc: "Gold-on-black design tokens, Cinzel display, DM Sans body — calibrated." },
-  { icon: BarChart3, title: "Analytics Dashboard", desc: "KPI cards, charts, sortable tables, and an activity feed ready to wire." },
-  { icon: Lock, title: "Auth Pages", desc: "Login, register, and password reset flows with social provider stubs." },
-  { icon: Settings, title: "Settings System", desc: "Profile, notifications, security, billing, and a danger zone tab." },
+  {
+    icon: UtensilsCrossed,
+    title: "Visual menu builder",
+    desc: "Categories, photos, modifiers, and dietary tags — publish when you're ready, no developer needed.",
+  },
+  {
+    icon: QrCode,
+    title: "QR code in minutes",
+    desc: "Every café gets a unique link and downloadable QR. Customers scan and browse on their phone.",
+  },
+  {
+    icon: Smartphone,
+    title: "Mobile-first ordering",
+    desc: "Guests build a cart, pick dine-in or takeaway, and track order status live from the same page.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Live order queue",
+    desc: "Staff see new orders instantly, move them through preparing → ready → served, with sound alerts.",
+  },
+  {
+    icon: BarChart3,
+    title: "Sales analytics",
+    desc: "Revenue, best sellers, peak hours, and category breakdown — export reports when you need them.",
+  },
+  {
+    icon: Zap,
+    title: "Built for small cafés",
+    desc: "Self-serve onboarding, simple plans, and an admin team that activates you after payment — no enterprise bloat.",
+  },
 ];
 
-const stats = [
-  { value: "14+", label: "Pages" },
-  { value: "100%", label: "Responsive" },
-  { value: "Dark+Light", label: "Themes" },
-  { value: "1", label: "Strong Brand" },
-];
-
-const testimonials = [
-  { initials: "AM", name: "Ada Morrison", role: "Design Lead, Northwind", quote: "Felt like our brand from the first commit. The gold + black system is restrained and confident." },
-  { initials: "JK", name: "Jonas Kessler", role: "CTO, Pylon", quote: "We replaced three internal libraries with this template. Saved us a full sprint of plumbing." },
-  { initials: "SR", name: "Saira Rahman", role: "Founder, Caelum", quote: "It just feels premium. Light mode is as polished as the dark one, which is rare." },
+const steps = [
+  {
+    step: "01",
+    title: "Create your café",
+    desc: "Register, verify your email, and choose Basic or Pro. We'll activate your subscription after payment.",
+  },
+  {
+    step: "02",
+    title: "Build & publish your menu",
+    desc: "Add categories and items, set hours, customize your brand colors, then publish with one click.",
+  },
+  {
+    step: "03",
+    title: "Share your QR code",
+    desc: "Print the QR at tables or the counter. Orders flow straight into your dashboard in real time.",
+  },
 ];
 
 function Index() {
+  const isClient = useIsClient();
+  const { data: plansData, isLoading: plansLoading } = useQuery({
+    queryKey: ["public", "plans", "landing"],
+    queryFn: fetchPublicPlans,
+    enabled: isClient,
+  });
+  const plans = plansData?.plans ?? [];
+
   return (
     <PublicLayout>
       {/* HERO */}
@@ -52,35 +109,48 @@ function Index() {
 
         <div className="relative z-10 text-center px-4 max-w-4xl">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold-soft bg-gold-dim text-gold text-xs font-medium tracking-wide">
-            <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-dot" />
-            Now Available — v2.0
+            <Sparkles className="h-3.5 w-3.5" />
+            CaféOS — for independent cafés
           </span>
 
           <h1
             className="mt-6 font-display font-bold leading-[1.05] tracking-tight"
             style={{ fontSize: "clamp(32px, 6vw, 72px)" }}
           >
-            Build <span className="text-gold">Digital</span> Experiences<br className="hidden sm:block" /> That Matter
+            Your menu. Your QR.{" "}
+            <span className="text-gold">Live orders.</span>
           </h1>
 
-          <p className="mt-6 text-muted-foreground text-base sm:text-lg max-w-xl mx-auto">
-            A premium React template for portfolios, SaaS, and dashboards — branded gold and black, dark and light, ready to ship.
+          <p className="mt-6 text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
+            Replace printed menus and shouted orders with a subscription platform built for small
+            café operators — digital menus, QR ordering, and a real-time kitchen queue.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg" className="font-medium">
               <Link to="/register">
-                Get Started
+                Start free signup
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/dashboard">View Dashboard</Link>
+              <Link to="/login">Owner sign in</Link>
             </Button>
           </div>
+
+          <p className="mt-6 text-xs text-muted-foreground">
+            Already running a café on CaféOS?{" "}
+            <Link to="/login" className="text-gold hover:underline">
+              Sign in to your dashboard
+            </Link>
+          </p>
         </div>
 
-        <a href="#features" className="absolute bottom-8 inset-x-0 flex justify-center text-muted-foreground" aria-label="Scroll to features">
+        <a
+          href="#features"
+          className="absolute bottom-8 inset-x-0 flex justify-center text-muted-foreground"
+          aria-label="Scroll to features"
+        >
           <ChevronDown className="h-5 w-5 animate-bounce" />
         </a>
       </section>
@@ -88,10 +158,13 @@ function Index() {
       {/* FEATURES */}
       <section id="features" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">What's Included</p>
-          <h2 className="mt-3 font-display text-3xl sm:text-5xl font-bold">Everything you need</h2>
+          <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">Features</p>
+          <h2 className="mt-3 font-display text-3xl sm:text-5xl font-bold">
+            Everything a modern café needs
+          </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            A complete starting point — every screen, every state, every breakpoint.
+            From menu display on Basic to full ordering and analytics on Pro — one platform, no
+            custom code.
           </p>
         </div>
 
@@ -112,57 +185,111 @@ function Index() {
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-border bg-card p-8 sm:p-12">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="font-display font-bold text-gold text-3xl sm:text-4xl">{s.value}</p>
-                <p className="mt-2 text-xs uppercase tracking-widest text-muted-foreground">{s.label}</p>
-              </div>
-            ))}
-          </div>
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 border-t border-border">
+        <div className="text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">How it works</p>
+          <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold">Up and running in three steps</h2>
         </div>
-      </section>
 
-      {/* TESTIMONIALS */}
-      <section id="about" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
-        <div className="text-center mb-12">
-          <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">Testimonials</p>
-          <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold">Trusted by builders</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {testimonials.map((t) => (
-            <Card key={t.name} className="p-6 bg-card">
-              <p className="text-sm text-foreground/90 leading-relaxed">"{t.quote}"</p>
-              <div className="mt-6 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-gold-dim border border-gold-soft flex items-center justify-center text-gold font-display text-sm">
-                  {t.initials}
-                </div>
-                <div>
-                  <p className="text-sm font-medium">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
-                </div>
-              </div>
-            </Card>
+        <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
+          {steps.map((s) => (
+            <div key={s.step} className="relative text-center md:text-left">
+              <span className="font-display text-5xl font-bold text-gold/25">{s.step}</span>
+              <h3 className="mt-2 font-display text-xl font-semibold">{s.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section id="pricing" className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-24">
-        <div className="rounded-2xl border border-gold-soft bg-gold-dim p-10 sm:p-14 text-center">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold">Ship your next idea today</h2>
+      {/* PRICING */}
+      <section id="pricing" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
+        <div className="text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-gold font-semibold">Pricing</p>
+          <h2 className="mt-3 font-display text-3xl sm:text-4xl font-bold">Simple plans for every café</h2>
           <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
-            Skip the plumbing. Start with a brand system, every layout, and every flow already in place.
+            Choose monthly or yearly billing at signup. Your plan is activated by our team after
+            payment — no surprise charges.
           </p>
-          <Button asChild size="lg" className="mt-8">
-            <Link to="/register">
-              Create your account
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          {plansLoading && isClient ? (
+            <>
+              <Card className="p-8 h-64 animate-pulse bg-muted/30" />
+              <Card className="p-8 h-64 animate-pulse bg-muted/30" />
+            </>
+          ) : plans.length > 0 ? (
+            plans.map((plan) => (
+              <Card
+                key={plan.id}
+                className={cn(
+                  "p-8 flex flex-col",
+                  plan.slug === "pro" && "border-gold-soft bg-gold-dim/30",
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-display text-2xl font-bold">{plan.name}</h3>
+                  {plan.slug === "pro" && (
+                    <Badge variant="outline" className="border-gold text-gold">
+                      Popular
+                    </Badge>
+                  )}
+                </div>
+                <p className="mt-2 text-3xl font-display font-bold text-gold">
+                  {formatMoneyPerMonth(plan.price_monthly)}
+                </p>
+                {plan.price_yearly != null && (
+                  <p className="text-sm text-muted-foreground">
+                    or {formatMoneyPerYear(plan.price_yearly)} billed yearly
+                  </p>
+                )}
+                <ul className="mt-6 space-y-2 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm">
+                      <Check className="h-4 w-4 text-gold shrink-0 mt-0.5" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Button asChild className="mt-8 w-full">
+                  <Link to="/register">Get started with {plan.name}</Link>
+                </Button>
+              </Card>
+            ))
+          ) : (
+            <Card className="p-8 md:col-span-2 text-center text-muted-foreground">
+              <p>Plans load when the API is running. Start signup to see options in your dashboard.</p>
+              <Button asChild className="mt-4">
+                <Link to="/register">Create account</Link>
+              </Button>
+            </Card>
+          )}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="rounded-2xl border border-gold-soft bg-gold-dim p-10 sm:p-14 text-center">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold">
+            Ready to digitize your café?
+          </h2>
+          <p className="mt-4 text-muted-foreground max-w-lg mx-auto">
+            Join independent owners who use CaféOS for menus, QR ordering, and live order management
+            — without hiring a developer.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button asChild size="lg">
+              <Link to="/register">
+                Create your café account
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/admin/login">Platform admin</Link>
+            </Button>
+          </div>
         </div>
       </section>
     </PublicLayout>

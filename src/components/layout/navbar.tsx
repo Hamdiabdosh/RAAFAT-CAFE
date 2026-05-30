@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 const links = [
   { to: "/", label: "Home" },
   { to: "/#features", label: "Features" },
+  { to: "/#how-it-works", label: "How it works" },
   { to: "/#pricing", label: "Pricing" },
-  { to: "/#about", label: "About" },
 ];
 
 export function Navbar() {
@@ -50,8 +50,11 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+            <Link to="/login">Sign in</Link>
+          </Button>
           <Button asChild variant="default" size="sm" className="hidden sm:inline-flex">
-            <Link to="/login">Get Started</Link>
+            <Link to="/register">Start free</Link>
           </Button>
           <Button
             variant="ghost"
@@ -78,8 +81,15 @@ export function Navbar() {
                 {l.label}
               </a>
             ))}
-            <Button asChild variant="default" size="sm" className="mt-2">
-              <Link to="/login" onClick={() => setOpen(false)}>Get Started</Link>
+            <Button asChild variant="outline" size="sm" className="mt-2">
+              <Link to="/login" onClick={() => setOpen(false)}>
+                Sign in
+              </Link>
+            </Button>
+            <Button asChild variant="default" size="sm">
+              <Link to="/register" onClick={() => setOpen(false)}>
+                Start free
+              </Link>
             </Button>
           </div>
         </div>

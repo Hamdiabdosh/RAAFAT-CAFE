@@ -23,14 +23,11 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as VerifyTokenRouteImport } from './routes/verify.$token'
 import { Route as ResetPasswordTokenRouteImport } from './routes/reset-password.$token'
 import { Route as MenuSlugRouteImport } from './routes/menu.$slug'
-import { Route as DashboardUsersRouteImport } from './routes/dashboard.users'
 import { Route as DashboardSetupRouteImport } from './routes/dashboard.setup'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardQrRouteImport } from './routes/dashboard.qr'
-import { Route as DashboardProjectsRouteImport } from './routes/dashboard.projects'
 import { Route as DashboardOrdersRouteImport } from './routes/dashboard.orders'
 import { Route as DashboardMenuRouteImport } from './routes/dashboard.menu'
-import { Route as DashboardContentRouteImport } from './routes/dashboard.content'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard.analytics'
 import { Route as AdminPlansRouteImport } from './routes/admin.plans'
@@ -111,11 +108,6 @@ const MenuSlugRoute = MenuSlugRouteImport.update({
   path: '/menu/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardUsersRoute = DashboardUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardSetupRoute = DashboardSetupRouteImport.update({
   id: '/setup',
   path: '/setup',
@@ -131,11 +123,6 @@ const DashboardQrRoute = DashboardQrRouteImport.update({
   path: '/qr',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardOrdersRoute = DashboardOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -144,11 +131,6 @@ const DashboardOrdersRoute = DashboardOrdersRouteImport.update({
 const DashboardMenuRoute = DashboardMenuRouteImport.update({
   id: '/menu',
   path: '/menu',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardContentRoute = DashboardContentRouteImport.update({
-  id: '/content',
-  path: '/content',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardBillingRoute = DashboardBillingRouteImport.update({
@@ -212,14 +194,11 @@ export interface FileRoutesByFullPath {
   '/admin/plans': typeof AdminPlansRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
-  '/dashboard/content': typeof DashboardContentRoute
   '/dashboard/menu': typeof DashboardMenuRoute
   '/dashboard/orders': typeof DashboardOrdersRouteWithChildren
-  '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/qr': typeof DashboardQrRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
-  '/dashboard/users': typeof DashboardUsersRoute
   '/menu/$slug': typeof MenuSlugRouteWithChildren
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/verify/$token': typeof VerifyTokenRoute
@@ -243,14 +222,11 @@ export interface FileRoutesByTo {
   '/admin/plans': typeof AdminPlansRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
-  '/dashboard/content': typeof DashboardContentRoute
   '/dashboard/menu': typeof DashboardMenuRoute
   '/dashboard/orders': typeof DashboardOrdersRouteWithChildren
-  '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/qr': typeof DashboardQrRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
-  '/dashboard/users': typeof DashboardUsersRoute
   '/menu/$slug': typeof MenuSlugRouteWithChildren
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/verify/$token': typeof VerifyTokenRoute
@@ -277,14 +253,11 @@ export interface FileRoutesById {
   '/admin/plans': typeof AdminPlansRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
-  '/dashboard/content': typeof DashboardContentRoute
   '/dashboard/menu': typeof DashboardMenuRoute
   '/dashboard/orders': typeof DashboardOrdersRouteWithChildren
-  '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/qr': typeof DashboardQrRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/setup': typeof DashboardSetupRoute
-  '/dashboard/users': typeof DashboardUsersRoute
   '/menu/$slug': typeof MenuSlugRouteWithChildren
   '/reset-password/$token': typeof ResetPasswordTokenRoute
   '/verify/$token': typeof VerifyTokenRoute
@@ -312,14 +285,11 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/dashboard/analytics'
     | '/dashboard/billing'
-    | '/dashboard/content'
     | '/dashboard/menu'
     | '/dashboard/orders'
-    | '/dashboard/projects'
     | '/dashboard/qr'
     | '/dashboard/settings'
     | '/dashboard/setup'
-    | '/dashboard/users'
     | '/menu/$slug'
     | '/reset-password/$token'
     | '/verify/$token'
@@ -343,14 +313,11 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/dashboard/analytics'
     | '/dashboard/billing'
-    | '/dashboard/content'
     | '/dashboard/menu'
     | '/dashboard/orders'
-    | '/dashboard/projects'
     | '/dashboard/qr'
     | '/dashboard/settings'
     | '/dashboard/setup'
-    | '/dashboard/users'
     | '/menu/$slug'
     | '/reset-password/$token'
     | '/verify/$token'
@@ -376,14 +343,11 @@ export interface FileRouteTypes {
     | '/admin/plans'
     | '/dashboard/analytics'
     | '/dashboard/billing'
-    | '/dashboard/content'
     | '/dashboard/menu'
     | '/dashboard/orders'
-    | '/dashboard/projects'
     | '/dashboard/qr'
     | '/dashboard/settings'
     | '/dashboard/setup'
-    | '/dashboard/users'
     | '/menu/$slug'
     | '/reset-password/$token'
     | '/verify/$token'
@@ -514,13 +478,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MenuSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/users': {
-      id: '/dashboard/users'
-      path: '/users'
-      fullPath: '/dashboard/users'
-      preLoaderRoute: typeof DashboardUsersRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/setup': {
       id: '/dashboard/setup'
       path: '/setup'
@@ -542,13 +499,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardQrRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/projects': {
-      id: '/dashboard/projects'
-      path: '/projects'
-      fullPath: '/dashboard/projects'
-      preLoaderRoute: typeof DashboardProjectsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/orders': {
       id: '/dashboard/orders'
       path: '/orders'
@@ -561,13 +511,6 @@ declare module '@tanstack/react-router' {
       path: '/menu'
       fullPath: '/dashboard/menu'
       preLoaderRoute: typeof DashboardMenuRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/content': {
-      id: '/dashboard/content'
-      path: '/content'
-      fullPath: '/dashboard/content'
-      preLoaderRoute: typeof DashboardContentRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/billing': {
@@ -651,28 +594,22 @@ const DashboardOrdersRouteWithChildren = DashboardOrdersRoute._addFileChildren(
 interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardBillingRoute: typeof DashboardBillingRoute
-  DashboardContentRoute: typeof DashboardContentRoute
   DashboardMenuRoute: typeof DashboardMenuRoute
   DashboardOrdersRoute: typeof DashboardOrdersRouteWithChildren
-  DashboardProjectsRoute: typeof DashboardProjectsRoute
   DashboardQrRoute: typeof DashboardQrRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardSetupRoute: typeof DashboardSetupRoute
-  DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardBillingRoute: DashboardBillingRoute,
-  DashboardContentRoute: DashboardContentRoute,
   DashboardMenuRoute: DashboardMenuRoute,
   DashboardOrdersRoute: DashboardOrdersRouteWithChildren,
-  DashboardProjectsRoute: DashboardProjectsRoute,
   DashboardQrRoute: DashboardQrRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardSetupRoute: DashboardSetupRoute,
-  DashboardUsersRoute: DashboardUsersRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
