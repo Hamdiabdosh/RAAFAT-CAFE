@@ -13,6 +13,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SelectPlanRouteImport } from './routes/select-plan'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PendingPaymentRouteImport } from './routes/pending-payment'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -56,6 +57,11 @@ const SelectPlanRoute = SelectPlanRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingPaymentRoute = PendingPaymentRouteImport.update({
+  id: '/pending-payment',
+  path: '/pending-payment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MaintenanceRoute = MaintenanceRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/pending-payment': typeof PendingPaymentRoute
   '/register': typeof RegisterRoute
   '/select-plan': typeof SelectPlanRoute
   '/settings': typeof SettingsRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/pending-payment': typeof PendingPaymentRoute
   '/register': typeof RegisterRoute
   '/select-plan': typeof SelectPlanRoute
   '/settings': typeof SettingsRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
+  '/pending-payment': typeof PendingPaymentRoute
   '/register': typeof RegisterRoute
   '/select-plan': typeof SelectPlanRoute
   '/settings': typeof SettingsRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/maintenance'
+    | '/pending-payment'
     | '/register'
     | '/select-plan'
     | '/settings'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/maintenance'
+    | '/pending-payment'
     | '/register'
     | '/select-plan'
     | '/settings'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/maintenance'
+    | '/pending-payment'
     | '/register'
     | '/select-plan'
     | '/settings'
@@ -365,6 +377,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
+  PendingPaymentRoute: typeof PendingPaymentRoute
   RegisterRoute: typeof RegisterRoute
   SelectPlanRoute: typeof SelectPlanRoute
   SettingsRoute: typeof SettingsRoute
@@ -406,6 +419,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-payment': {
+      id: '/pending-payment'
+      path: '/pending-payment'
+      fullPath: '/pending-payment'
+      preLoaderRoute: typeof PendingPaymentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maintenance': {
@@ -649,6 +669,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
+  PendingPaymentRoute: PendingPaymentRoute,
   RegisterRoute: RegisterRoute,
   SelectPlanRoute: SelectPlanRoute,
   SettingsRoute: SettingsRoute,

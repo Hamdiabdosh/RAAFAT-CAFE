@@ -60,7 +60,7 @@ function SelectPlanPage() {
       await selectPlan(slug, billingInterval);
       await refreshMe();
       toast.success("Plan selected. Awaiting admin activation.");
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/pending-payment" });
     } catch (err) {
       toast.error(getApiErrorMessage(err));
     } finally {

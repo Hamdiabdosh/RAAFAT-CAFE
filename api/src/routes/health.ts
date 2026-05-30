@@ -1,14 +1,23 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
-import { sendSuccess } from "../lib/response.js";
 
 export const healthRouter = Router();
 
-healthRouter.get("/health", async (_req, res, next) => {
+healthRouter.get("/health", async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
-    sendSuccess(res, { status: "ok", database: "connected" });
-  } catch (error) {
-    next(error);
+    res.json({
+      status: "ok",
+      db: "ok",
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+    });
+  } catch {
+    res.status(503).json({
+      status: "degraded",
+      db: "unreachable",
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString(),
+    });
   }
 });

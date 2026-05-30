@@ -1,16 +1,64 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
-import { ENTITLEMENTS, ENTITLEMENT_KEYS, type EntitlementKey } from "@/lib/entitlements";
-import { formatMoneyPerMonth, formatMoneyPerYear } from "@/lib/public-api";
+
+/** Placeholder payment details — update before going live. */
+const PAYMENT = {
+  TELEBIRR_NUMBER: "[TELEBIRR_NUMBER]",
+  CBE_ACCOUNT: "[CBE_ACCOUNT]",
+  BUSINESS_NAME: "[BUSINESS_NAME]",
+  BANK_NAME: "[BANK_NAME]",
+  ACCOUNT_NUMBER: "[ACCOUNT_NUMBER]",
+  CONTACT_EMAIL: "[CONTACT_EMAIL]",
+} as const;
 
 export const Route = createFileRoute("/dashboard/billing")({
   head: () => ({ meta: [{ title: "Subscription — CaféOS" }] }),
   component: BillingPage,
 });
+
+function statusBadgeVariant(status: string): "default" | "secondary" | "destructive" {
+  if (status === "active") return "default";
+  if (status === "expired") return "destructive";
+  return "secondary";
+}
+
+function PaymentInstructionsCard() {
+  return (
+    <Card className="p-6 bg-card">
+      <h3 className="font-display text-lg font-semibold mb-4">Payment instructions</h3>
+      <div className="text-sm space-y-4">
+        <div>
+          <p className="font-medium">Method 1: Telebirr</p>
+          <p className="text-muted-foreground mt-1">
+            Account: {PAYMENT.TELEBIRR_NUMBER} · Name: {PAYMENT.BUSINESS_NAME}
+          </p>
+        </div>
+        <div>
+          <p className="font-medium">Method 2: CBE</p>
+          <p className="text-muted-foreground mt-1">
+            Account: {PAYMENT.CBE_ACCOUNT} · Name: {PAYMENT.BUSINESS_NAME}
+          </p>
+        </div>
+        <div>
+          <p className="font-medium">Method 3: Bank transfer</p>
+          <p className="text-muted-foreground mt-1">
+            Bank: {PAYMENT.BANK_NAME} · Account: {PAYMENT.ACCOUNT_NUMBER}
+          </p>
+        </div>
+        <p className="text-muted-foreground border-t border-border pt-4">
+          After sending payment, email us at{" "}
+          <a href={`mailto:${PAYMENT.CONTACT_EMAIL}`} className="text-gold hover:underline">
+            {PAYMENT.CONTACT_EMAIL}
+          </a>{" "}
+          with your registered email and payment screenshot.
+        </p>
+      </div>
+    </Card>
+  );
+}
 
 function BillingPage() {
   const subscription = useAuthStore((s) => s.subscription);
@@ -18,94 +66,54 @@ function BillingPage() {
 
   const planName = subscription?.plan.name ?? owner?.selected_plan ?? "Not selected";
   const status = subscription?.status ?? owner?.subscription_status ?? "pending";
-  const features = subscription?.plan.features ?? [];
-  const entitlements = subscription?.plan.entitlements;
-  const enabledEntitlements = entitlements
-    ? ENTITLEMENT_KEYS.filter((k) => entitlements[k as EntitlementKey])
-    : [];
-
-  const billingLabel =
-    owner?.selected_billing_interval === "yearly"
-      ? "Yearly"
-      : owner?.selected_billing_interval === "monthly"
-        ? "Monthly"
-        : null;
 
   return (
     <>
       <PageHeader
         title="Subscription"
-        subtitle="View your plan status. Changes and activation are handled by the platform admin."
+        subtitle="View your plan status and payment details."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 max-w-3xl">
+      <div className="max-w-2xl space-y-4">
         <Card className="p-6 bg-card relative overflow-hidden">
           <div className="absolute top-0 inset-x-0 h-0.5 bg-gold" />
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">Current plan</p>
-          <p className="mt-2 font-display text-2xl font-bold text-gold capitalize">{planName}</p>
-          {subscription?.plan.price_monthly != null && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {formatMoneyPerMonth(subscription.plan.price_monthly)}
-              {subscription.plan.price_yearly != null &&
-                ` · ${formatMoneyPerYear(subscription.plan.price_yearly)}`}
-            </p>
-          )}
-          {billingLabel && (
-            <p className="text-xs text-muted-foreground mt-1">
-              Requested billing: {billingLabel}
-            </p>
-          )}
-          <Badge className="mt-3" variant={status === "active" ? "default" : "secondary"}>
-            {status}
-          </Badge>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-muted-foreground">Current plan</p>
+              <p className="mt-2 font-display text-2xl font-bold text-gold capitalize">{planName}</p>
+            </div>
+            <Badge variant={statusBadgeVariant(status)} className="capitalize">
+              {status}
+            </Badge>
+          </div>
           {subscription?.starts_at && (
-            <p className="mt-4 text-xs text-muted-foreground">
+            <p className="mt-4 text-sm text-muted-foreground">
               Started: {new Date(subscription.starts_at).toLocaleDateString()}
             </p>
           )}
           {subscription?.expires_at && (
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-sm text-muted-foreground">
               Expires: {new Date(subscription.expires_at).toLocaleDateString()}
-            </p>
-          )}
-          {status !== "active" && (
-            <p className="mt-4 text-sm text-muted-foreground">
-              {status === "expired"
-                ? "Your subscription has expired. Contact the platform admin to renew."
-                : "Your subscription is pending activation. Pay offline, then contact the platform admin to activate your account."}
             </p>
           )}
         </Card>
 
         <Card className="p-6 bg-card">
-          <h3 className="font-display text-lg font-semibold mb-4">What&apos;s included</h3>
-          {enabledEntitlements.length > 0 ? (
-            <ul className="space-y-2 text-sm mb-4">
-              {enabledEntitlements.map((k) => (
-                <li key={k} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-gold shrink-0" />
-                  {ENTITLEMENTS[k].label}
-                </li>
-              ))}
-            </ul>
-          ) : features.length > 0 ? (
-            <ul className="space-y-2 text-sm mb-4">
-              {features.map((f) => (
-                <li key={f} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-gold shrink-0" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground mb-4">
-              Feature list appears once your plan is assigned.
-            </p>
-          )}
-          <p className="text-xs text-muted-foreground border-t border-border pt-4">
-            To upgrade, downgrade, or renew, contact your platform administrator.
+          <h3 className="font-display text-lg font-semibold mb-2">Renew / Upgrade</h3>
+          <p className="text-sm text-muted-foreground">
+            To renew or change your plan, contact us at{" "}
+            <a href={`mailto:${PAYMENT.CONTACT_EMAIL}`} className="text-gold hover:underline">
+              {PAYMENT.CONTACT_EMAIL}
+            </a>{" "}
+            or visit{" "}
+            <Link to="/select-plan" className="text-gold hover:underline">
+              /select-plan
+            </Link>
+            .
           </p>
         </Card>
+
+        {status === "pending" && <PaymentInstructionsCard />}
       </div>
     </>
   );

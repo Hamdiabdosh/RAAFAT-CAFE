@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import rateLimit from "express-rate-limit";
 import path from "node:path";
 import { corsOrigins, env } from "./config/env.js";
 import { errorHandler } from "./middleware/error-handler.js";
@@ -39,6 +40,33 @@ export function createApp() {
     }),
   );
   app.use(express.json({ limit: "1mb" }));
+
+  // Tier 1 — auth endpoints (strict): 10 requests per 15 minutes per IP
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many attempts. Please try again in 15 minutes." },
+  });
+
+  // Tier 2 — public ordering endpoints: 60 requests per minute per IP
+  const publicLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests. Please slow down." },
+  });
+
+  // Tier 3 — authenticated API: 300 requests per minute per IP
+  const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
   app.use("/uploads", express.static(path.join(getUploadRoot())));
 
   app.get("/", (_req, res) => {
@@ -46,13 +74,13 @@ export function createApp() {
   });
 
   app.use("/api", healthRouter);
-  app.use("/api/auth", authRouter);
+  app.use("/api/auth", authLimiter, authRouter);
+  app.use("/api/public", publicLimiter, publicRouter);
+  app.use("/api/cafe", apiLimiter, cafeRouter);
+  app.use("/api/menu", apiLimiter, menuRouter);
+  app.use("/api/orders", apiLimiter, ordersRouter);
+  app.use("/api/analytics", apiLimiter, analyticsRouter);
   app.use("/api/admin", adminRouter);
-  app.use("/api/cafe", cafeRouter);
-  app.use("/api/menu", menuRouter);
-  app.use("/api/public", publicRouter);
-  app.use("/api/orders", ordersRouter);
-  app.use("/api/analytics", analyticsRouter);
 
   app.use(errorHandler);
 
